@@ -1,0 +1,752 @@
+/* Input Area & Command Autocomplete */
+.input-area {
+  position: relative;
+  padding: 0 24px 24px;
+}
+
+.input-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(100%, var(--conversation-max-width));
+  margin: 0 auto;
+  padding: 8px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(18, 24, 44, 0.9), rgba(15, 20, 37, 0.85));
+  border: 1px solid rgba(var(--tint-rgb), 0.08);
+  box-shadow: var(--shadow-md);
+}
+
+.input-shell.drag-active {
+  border-color: rgba(139, 124, 255, 0.38);
+  box-shadow: 0 0 0 1px rgba(139, 124, 255, 0.18), 0 20px 40px rgba(91, 76, 201, 0.18);
+}
+
+.image-preview-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 8px;
+}
+
+.image-preview-item {
+  position: relative;
+  flex: 0 0 auto;
+  width: 88px;
+  height: 88px;
+  padding: 6px;
+  border-radius: 18px;
+  background: rgba(var(--tint-rgb), 0.04);
+  border: 1px solid rgba(var(--tint-rgb), 0.08);
+  box-shadow: var(--shadow-sm);
+}
+
+.image-preview-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.image-preview-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(5, 8, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  cursor: pointer;
+}
+
+.doc-preview-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 96px;
+  max-width: 200px;
+  animation: floatUp 220ms ease-out;
+}
+
+.doc-preview-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 6px 10px;
+}
+
+.doc-preview-icon {
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.doc-preview-name {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  line-height: 1.2;
+}
+
+/* ---- Meta row ---- */
+.input-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 8px 0;
+}
+
+.input-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-meta-icon {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.input-title {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.input-meta-sep {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.input-hint {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+/* ---- Input box: textarea-wrap + send ---- */
+.input-box {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 4px;
+}
+
+.input-textarea-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  min-height: 64px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(var(--tint-rgb), 0.04);
+  border: 1px solid rgba(var(--tint-rgb), 0.08);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input-textarea-wrap:focus-within {
+  border-color: rgba(139, 124, 255, 0.38);
+  box-shadow: 0 0 0 3px rgba(139, 124, 255, 0.08);
+}
+
+/* Expanded state */
+.input-textarea-wrap.expanded textarea {
+  max-height: calc(50vh - 40px);
+}
+
+.input-area textarea {
+  flex: 1;
+  min-height: 32px;
+  max-height: 184px;
+  padding: 2px 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  color: var(--text-primary);
+  resize: none;
+  line-height: 1.6;
+  font-size: 0.875rem;
+}
+
+/* Ensure no border/outline/shadow in ANY state */
+.input-area textarea:focus,
+.input-area textarea:focus-visible,
+.input-area textarea:focus-within,
+.input-area textarea:active {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.input-area textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.input-area textarea:disabled {
+  opacity: 0.7;
+}
+
+/* ---- Attach (inline icon inside textarea wrap) ---- */
+.btn-attach-inline {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin-top: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: color var(--transition-fast);
+}
+
+.btn-attach-inline:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.btn-attach-inline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- Expand/collapse toggle ---- */
+.btn-expand-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color var(--transition-fast);
+}
+
+.btn-expand-toggle:hover {
+  color: var(--accent);
+}
+
+/* ---- Send button (square icon-only) ---- */
+.btn-send {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: var(--shadow-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform var(--transition-medium),
+    box-shadow var(--transition-medium),
+    background var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.btn-send:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.btn-send:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.btn-send:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-send-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.btn-send.sending {
+  gap: 0;
+}
+
+.btn-send-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-send-spinner span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.8;
+  animation: thinkingPulse 1s ease-in-out infinite;
+}
+
+.btn-send-spinner span:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.btn-send-spinner span:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+/* ---- Upload hint ---- */
+.input-upload-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0 8px 4px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
+.input-error {
+  color: var(--error);
+}
+
+.input-upload-hint .input-error {
+  margin-left: auto;
+}
+
+/* ---- Shell refinements (dark) ---- */
+.input-shell {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(19, 25, 46, 0.94), rgba(13, 18, 34, 0.92));
+  border-color: rgba(var(--tint-rgb), 0.07);
+  box-shadow: 0 22px 46px rgba(4, 8, 20, 0.24);
+}
+
+.input-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 20%, transparent 86%, rgba(4, 8, 20, 0.08));
+  pointer-events: none;
+}
+
+.input-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.input-shell-busy {
+  border-color: rgba(139, 124, 255, 0.16);
+}
+
+/* ---- Drag mask ---- */
+.input-drag-mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(9, 12, 24, 0.62);
+  backdrop-filter: blur(12px);
+  z-index: 3;
+}
+
+.input-drag-mask-card {
+  min-width: min(100%, 320px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(20, 27, 50, 0.94);
+  border: 1px solid rgba(139, 124, 255, 0.2);
+  box-shadow: 0 20px 36px rgba(4, 8, 20, 0.28);
+  text-align: center;
+}
+
+.input-drag-mask-icon {
+  font-size: 1.3rem;
+  color: var(--accent-cyan);
+}
+
+.input-drag-mask-card span {
+  color: var(--text-tertiary);
+  font-size: 0.88rem;
+}
+
+/* ---- Status badge ---- */
+.input-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(116, 215, 255, 0.08);
+  border: 1px solid rgba(116, 215, 255, 0.16);
+  color: var(--accent-cyan);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.input-status-badge.busy {
+  background: rgba(139, 124, 255, 0.1);
+  border-color: rgba(139, 124, 255, 0.18);
+  color: var(--text-primary);
+}
+
+/* ---- Attachment summary ---- */
+.input-attachment-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  margin: 0 4px;
+  border-radius: 12px;
+  background: rgba(var(--tint-rgb), 0.035);
+  border: 1px solid rgba(var(--tint-rgb), 0.07);
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+}
+
+.input-clear-attachments {
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.input-clear-attachments:hover:not(:disabled) {
+  color: var(--text-primary);
+  transform: translateY(var(--motion-lift-xs));
+}
+
+/* ==========================================
+ *  Command Autocomplete
+ * ========================================== */
+.command-autocomplete {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 48px), var(--conversation-max-width));
+  margin-bottom: 4px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  z-index: 60;
+}
+
+.command-autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.command-autocomplete-item:hover,
+.command-autocomplete-item.active {
+  background: var(--bg-hover);
+}
+
+.command-autocomplete-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--accent);
+  min-width: 60px;
+}
+
+.command-autocomplete-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.command-autocomplete-usage {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: 'Fira Code', 'Consolas', monospace;
+}
+
+/* autocomplete transition */
+.autocomplete-enter-active,
+.autocomplete-leave-active {
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+.autocomplete-enter-from,
+.autocomplete-leave-to {
+  transform: translateY(6px);
+  opacity: 0;
+}
+
+/* === Light Theme === */
+
+:root[data-theme="light"] .input-shell {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(245, 247, 252, 0.9));
+}
+
+/* ==========================================
+ *  Compact Button
+ * ========================================== */
+.btn-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(var(--tint-rgb), 0.06);
+  border: 1px solid rgba(var(--tint-rgb), 0.1);
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-compact:hover:not(:disabled) {
+  background: rgba(var(--tint-rgb), 0.12);
+  color: var(--accent);
+  border-color: rgba(var(--tint-rgb), 0.18);
+}
+
+.btn-compact:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-compact-icon {
+  font-size: 0.8rem;
+}
+
+/* ==========================================
+ *  Send Button — enqueue variant
+ * ========================================== */
+.btn-send.enqueue {
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent) 100%);
+}
+
+/* ==========================================
+ *  Message Queue Bar
+ * ========================================== */
+.message-queue-bar {
+  position: relative;
+  width: min(100%, var(--conversation-max-width));
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.queue-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+}
+
+.queue-bar-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.queue-bar-icon {
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.queue-bar-clear {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.queue-bar-clear:hover {
+  color: var(--error);
+}
+
+.queue-bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 0 4px 8px;
+}
+
+.queue-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(var(--tint-rgb), 0.04);
+  border: 1px solid rgba(var(--tint-rgb), 0.07);
+  transition: opacity var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+  cursor: default;
+}
+
+/* ---- Drag handle ---- */
+.queue-bar-item-handle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+  cursor: grab;
+  font-size: 1rem;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.queue-bar-item:hover .queue-bar-item-handle {
+  opacity: 1;
+  color: var(--text-secondary);
+}
+
+.queue-bar-item-handle:active {
+  cursor: grabbing;
+}
+
+/* ---- Drag index badge ---- */
+.queue-bar-item-index {
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ---- Drag states ---- */
+.queue-bar-item.dragging {
+  opacity: 0.35;
+}
+
+.queue-bar-item.drag-over-above {
+  border-top: 2px solid var(--accent);
+  padding-top: 5px;
+}
+
+.queue-bar-item.drag-over-below {
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 5px;
+}
+
+.queue-bar-item-text {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-bar-item-remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  font-size: 0.85rem;
+}
+
+.queue-bar-item-remove:hover {
+  color: var(--error);
+  background: rgba(255, 100, 100, 0.1);
+}
+
+/* ---- Edit button ---- */
+.queue-bar-item-edit {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  font-size: 0.85rem;
+}
+
+.queue-bar-item-edit:hover {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.queue-bar-item-edit.confirm:hover {
+  color: var(--success, #22c55e);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.queue-bar-item-edit.cancel:hover {
+  color: var(--error);
+  background: rgba(255, 100, 100, 0.1);
+}
+
+/* ---- Inline edit input ---- */
+.queue-bar-item-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--accent);
+  outline: none;
+  padding: 2px 0;
+  font-family: inherit;
+}
+
+/* Queue bar transition */
+.queue-bar-enter-active,
+.queue-bar-leave-active {
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+.queue-bar-enter-from,
+.queue-bar-leave-to {
+  transform: translateY(8px);
+  opacity: 0;
+}
